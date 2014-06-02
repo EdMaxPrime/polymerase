@@ -1,0 +1,12 @@
+Polymerase:
+  version: 0.12
+  author: "Max Zlotskiy"
+  supported_langs:
+    - "processing"
+  languages:
+    - "javascript"
+  misc:
+    response:
+      desc: "The response from the specialized code checker"
+      status:
+        0: everything is gfine

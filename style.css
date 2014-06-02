@@ -1,0 +1,55 @@
+div.consoleBottom {
+    background-color: rgba(62, 70, 81, 0.8);
+    color: #F0F0F0;
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 12pt;
+    padding: 0.5em 1em;
+    position: fixed;
+    margin-left: -1%;
+    height: 20%;
+    width: 97%;
+    overflow: scroll;
+    overflow-y: scroll;
+    z-index: 50;
+    top: 79%;
+    float: left;
+}
+.consoleInput {
+    width: 90%;
+    padding-left: 1em;
+    height: 1.2em;
+    font-size: 0.9em;
+    font-family: 'Ubuntu Mono', monospace;
+    border-style: none;
+    background-color: rgb(62, 70, 81);
+    color: #F0F0F0;
+    position: fixed;
+    bottom: 0;
+}
+.consoleInput:focus {
+    outline: none;
+    
+}
+/*#3E4651 #F1654C #00B5B5 #F0F0F0*/
+.xbutton {
+    float:right;
+    height: 1.15em;
+    padding: 0.1em 0.5em;
+    margin-left: 95%;
+    position: fixed;
+    background-color: #0c0c0c;
+    border: 1px solid black;
+    cursor:pointer;
+    color: white;
+    border-radius: 1em;
+}
+a.button {
+    display: inline-block;
+    background: rgb(190, 129, 60);
+    color: #ffffff;
+    padding: 0.25em 2em;
+    cursor: pointer;
+    border-style: solid;
+    border-width: 5px;
+    border-color: rgb(240, 211, 200);
+}
