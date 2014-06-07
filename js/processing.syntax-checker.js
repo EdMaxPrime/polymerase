@@ -23,17 +23,17 @@ window.onload = function() {
                     );
             var classes = new Array("int", "String", "float", "boolean", "char", "Object", "PShape", "PVector", "PFont", "PImage", "PGraphics", "color");
             var inside = new Array("body");
+            var blacklist = new Array();
             
             
             for(var ln = 0; ln < code.length; ln++) {
                 var line = code[ln].replace("\r", "").replace("\t", "").replace(/ {2,}/g, " ").trim(); //Replaces lots of spaces with just one space
                 //General check
                 if (line === "" || line === "\n" || line === "\r\n") {
-                    printer.warn("Empty line on line " + (ln + 1));
                     continue;
-                } else if (line.indexOf("@syntax-checker") > -1) { //this is a message to us
-                    var syntaxparams = line.substring(line.indexOf("@syntax-checker") + 16, line.length).split(" ");
-                    
+                } else if (line.indexOf("@syntax-checker(") > -1) { //this is a message to us
+                    var syntaxparams = line.substring(line.indexOf("@syntax-checker(") + 16, line.indexOf(");", line.indexOf("@syntax-checker("))).split(" ");
+                    this.printer.println(syntaxparams.join(" "));
                 }
                 
                 //Detailed check
@@ -44,6 +44,7 @@ window.onload = function() {
                             continue; //Continue to next char
                         } else if (c === '/' && line.charAt(i-1) === '*') {
                             inside.pop();
+                            this.printer.println("Comment ended on line " + ln);
                             continue; // No need to further interpret this, continue to next char
                         }
                     }
@@ -67,7 +68,7 @@ window.onload = function() {
                     } else if (c === "\"") {
                         inside.push("string");
                     }
-                    else if (c === "*" && line.charAt(i - 1) === "/") {
+                    else if (c === "*" && line.charAt(i - 1) === "/" && inside[inside.length-1] !== "multiline comment") {
                         inside.push("multiline comment");
                     }
                     else if (c === "/" && line.charAt(i - 1) === "/") {

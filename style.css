@@ -53,3 +53,15 @@ a.button {
     border-width: 5px;
     border-color: rgb(240, 211, 200);
 }
+code.block {
+    background-color: #dddddd;
+    display: block;
+    border-style: solid;
+    border-width: thin;
+    border-color: black;
+    border-radius: 5px;
+    color: black;
+    padding: 2em 0;
+    width: 33%;
+    overflow: scroll;
+}

@@ -49,10 +49,48 @@ The Console class has a few methods:
 * println(message)
 * warn(message)
 * error(message)
-You may add your own with the `prototype`
 
-__IMPORTANT: WINDOW.CONSOLE IS DIFFERENT FROM THIS__
+You may add your own methods with the `Console.prototype`
+
+It is important to know that window.console is *not* the same thing as any Console object.
 
 ## Commands
 
 In order to avoid collisions with any other scripts that may be using the same Console object, all of the commands this library uses are prefixed with “empsc”. Eg: `empsc param1 param2 param3`
+
+Commands are not yet present, but they will be added soon. If you are wondering how to check your code for now, look at the “check code” button in the example index.html.
+
+## Modules
+
+Modules are an important part of the syntax-checker because they make it extendable. And in fact most of it is up to you, because you are attaching a function to the Polymerase class. Polymerase is a type of enzyme in human cells that checks for DNA errors among other things.
+
+    Polymerase.prototype.exampleLanguage = function(code) {
+        // Add your checking code here
+    }
+
+The Polymerase class will pass an array as the code parameter. The array is the code that is to be checked, but split by line breaks. Every element is a String containing one line of code.
+
+When you ask to check code you pass an array of strings, which are the names of methods. If you pass more than one, everything after the first becomes a fallback. If the first language returns an error it will log it to the console and then the second language will resume from the point where the first one left off, and so on.
+
+While this works, it has not yet been fully implemented as languages must transfer a list of defined variables and functions to each other, which thankfully is a universal concept in most languages that are not markup based.
+
+### Processing
+
+[Processing](http://processing.org) is a great visualization language for beginners and advanced users. It is available on several languages including java and javascript. However, do not let the names fool you. Java and javascript can have different syntax at times and have no libraries in common.
+
+The solution: the Processing team has made processing syntax the same on all language ports. The javascript version [processing.js](http://processingjs.org) uses the same syntax as the java version. So checking the code should be easy, right?
+
+Well as is the case with multiple language porting, you can use native code. So while there is a standard processing syntax, javascript mode allows you to use javascript syntax and java mode allows you to use java syntax. This makes things a bit more challenging.
+
+Thankfully there are fallback languages as described above. There are also annotations. On each line the processing syntax checker looks for this annotation:
+
+    @syntax-checker(args);
+
+It must end with a ); because arguments are space delimited.
+
+## Credits
+
+More will be added.
+* EdMaxPrime for creating Console.js, the main syntax-checker, and the processing module
+* [Craig](http://craig.is) for creating the key binding library used in the example html file
+* [jquery](http://jquery.org) for use in the example html file

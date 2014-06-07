@@ -7,17 +7,20 @@
 </head>
 
 <body style="background-color: #fdf6e3;">
-    <a class="button" onclick="new Polymerase(document.getElementById('elcode').innerHTML).checkCode(['processing']);">Check the code!</a>
+    <a class="button" onclick="new Polymerase($('#elcode').html()).checkCode(['processing']);">Check the code!</a>
     <a class="button" onclick="alert('How ya doing?');">Continue</a><br>
-    <code id="elcode" style="background-color: #ffffff;">
+    <code id="elcode" class="block">
         <pre>
         /*
-        * @syntax-checker ignore 9
+        * @syntax-checker(ignore 4); This means ignore line number four
+        * @syntax-checker(ignore ~4); This means ignore the line four lines down
+        * @syntax-checker(ignore -range ~3,9); This means ignore from 3 lines below to line 9(inclusive)
+        * @syntax-checker(ignore 9,10,11,~1); This means ignore lines 9, 10 and 7
         */
-        String       s; //a temporary strings
+        String       s;
+        String name = "syntax-checker demo";
         int counter;
-        /*No "\g" */
-        "\\g";
+        boolean running;
         </pre>
     </code>
     
