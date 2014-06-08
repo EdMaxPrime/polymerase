@@ -25,6 +25,7 @@ function Console(elem) {
             }
         }
     }
+    /*Deprecated. Will be removed soon.*/
     this.keyReleased = function(event) {
         var key = event.keyCode? event.keyCode : event.which;
         var charCode = String.fromCharCode(key).toLocaleLowerCase();

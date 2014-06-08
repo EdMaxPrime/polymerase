@@ -79,6 +79,9 @@ window.onload = function() {
             return {line: code.length, reason : "Default:Defaulted to this", status: 0};
         }
     } else {
-        //Add code that attaches main script to document
+        var script = document.createElement("script");
+        script.setAttribute("src", "https://raw.githubusercontent.com/EdMaxPrime/polymerase/master/js/syntax-checker.js");
+        script.setAttribute("type", "text/javascript");
+        document.getElementsByTagName("body")[0].appendChild(script);
     }
 }
