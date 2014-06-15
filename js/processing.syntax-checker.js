@@ -31,9 +31,9 @@ window.onload = function() {
                 //General check
                 if (line === "" || line === "\n" || line === "\r\n") {
                     continue;
-                } else if (line.indexOf("@syntax-checker(") > -1) { //this is a message to us
-                    var syntaxparams = line.substring(line.indexOf("@syntax-checker(") + 16, line.indexOf(");", line.indexOf("@syntax-checker("))).split(" ");
-                    this.printer.println(syntaxparams.join(" "));
+                } else if (line.indexOf("@pms(") > -1) { //this is a message to us
+                    var syntaxparams = line.substring(line.indexOf("@pms(") + 5, line.indexOf(");", line.indexOf("@pms("))).split(" ");
+                    printer.println(syntaxparams.join(" "));
                 }
                 
                 //Detailed check
@@ -44,7 +44,6 @@ window.onload = function() {
                             continue; //Continue to next char
                         } else if (c === '/' && line.charAt(i-1) === '*') {
                             inside.pop();
-                            this.printer.println("Comment ended on line " + ln);
                             continue; // No need to further interpret this, continue to next char
                         }
                     }
@@ -83,5 +82,6 @@ window.onload = function() {
         script.setAttribute("src", "https://raw.githubusercontent.com/EdMaxPrime/polymerase/master/js/syntax-checker.js");
         script.setAttribute("type", "text/javascript");
         document.getElementsByTagName("body")[0].appendChild(script);
+        console.log("Added: " + Polymerase);
     }
 }
