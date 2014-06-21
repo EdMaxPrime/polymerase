@@ -1,6 +1,7 @@
 function Console(elem) {
     this.element = elem;
-    this.activeProcess = "";
+    this.activeProcessName = "\\";
+    this.activeProcess = undefined;
     this.commandTasks = new Array();
     this.amountLogged = 0;
     this.parser = {
@@ -30,7 +31,7 @@ function Console(elem) {
             return text;
         },
         stripHTML : function(str) {
-            var result = str.replace(/(&nbsp;)+/gi, " ").replace(/(<([^>]+)>)/ig, "").replace(/(&gt;)+/gi, ">").replace(/(&lt;)+/gi, "<");
+            var result = str.replace(/&nbsp;/gi, " ").replace(/(<([^>]+)>)/gi, "").replace(/&gt;/gi, ">").replace(/&lt;/gi, "<");
             return result;
         },
         addArray : function(arr) {
@@ -41,6 +42,18 @@ function Console(elem) {
             return result;
         }
     };
+    this.children = [];
+    this.getChild = function(id) {
+        if (this.children.hasOwnProperty(id) === true) {
+            return this.children[id];
+        } else {
+            this.children[id] = {
+                real : false,
+                childId : id
+            };
+            return this.children[id];
+        }
+    }
     this.println = function(msg) {
         console.log(msg);
         this.element.removeChild(this.element.childNodes[this.element.childNodes.length - 1]);
@@ -49,12 +62,53 @@ function Console(elem) {
         this.element.scrollTop = this.element.scrollHeight;
         this.amountLogged++;
     }
-    this.addTask = function(process, action) {
-        this.commandTasks[process] = action;
+    this.addTask = function(action) {
+        this.commandTasks.push(action);
+    }
+    this.setProcess = function(theName, action) {
+        if (this.activeProcess === "\\") {
+            this.activeProcessName = theName;
+            this.activeProcess = action;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    this.removeTask = function(task) {
+        this.commandTasks.splice(this.commandTasks.indexOf(task), 1);
+    }
+    this.exitProcess = function(name) {
+        if (typeof name !== 'undefined') {
+            if (name === this.activeProcessName) {
+                this.activeProcessName = "\\";
+                this.activeProcess = undefined;
+            }
+        } else {
+            this.activeProcessName = "\\";
+            this.activeProcess = undefined;
+        }
+    }
+    this.supports = function(what) { //returns true if it is supported, otherwise false
+        if (what === "println" || what === "error" || what === "warn" || what === "success" || what === "table") {
+            return true;
+        }
+        if (what === "error(msg,id)" || what === "success(mgs,id)" || what === "warn(msg,id)") {
+            return true;
+        }
+        if (what === "commandTasks" || what === "addTask" || what === "commandTasks/preventOthers" || what === "removeTask[task|index]") {
+            return true;
+        }
+        if (what === "activeProcess" || what === "setProcess" || what === "activeProcessName" || what === "exitProcess") {
+            return true;
+        }
+        if (what === "amountLogged" || what === "divStyleLogging" || what === "0.07" || what === 0.07 || what === "chrome 19+") {
+            return true;
+        }
+        return false;
     }
     this.error = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
-        this.println("<div style='color:#F1654C;' id='" + theId + "'><b>&gt;&gt;&gt;</b>    " + msg + "</div>")
+        this.println("<div style='color:#F1654C;' id='" + theId + "'><b>&gt;&gt;&gt;</b>    " + msg + "</div>");
     }
     this.warn = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
@@ -65,11 +119,14 @@ function Console(elem) {
         this.println("<div style='color:rgb(116, 243, 133);' id='" + theId + "'>" + msg + "</div>");
     }
     this.table = function(data, options) {
-        var hr = "-";
-        var vr = "|";
+        var hr = "-"; //horizontal rule
+        var vr = "|"; //vertical rule
         var fixedwidth = 15; //to make this 'undefined'(to use different widths for each column) make this negative in options
         var widths = new Array();
-        var longestcolumn = 1;
+        var longestcolumn = 1; //the length of the longest array in data
+        var ve = "[|]"; //Vertical edge
+        var he = "="; //Horizontal edge
+        var vh = "+"; //Vertical horizontal intersection
         if (options) {
             if (options.hasOwnProperty("horizontalRule") === true) {
                 hr = options.horizontalRule;
@@ -114,25 +171,38 @@ function Console(elem) {
         }
         /*Now we actually print everything*/
         for(var row = 0; row < data[0].length; row++) {
-            var line = vr + vr; //this is what we will be printing
+            var line = ve; //this is what we will be printing
             for(var col = 0; col < data.length; col++) {
-                    line += data[col][row] + vr;
+                    line += data[col][row];
                     if (col === (data.length - 1)) {
-                        line += vr; //extra vertical rule at the end
+                        line += ve; //vertical edge at the end
+                    } else {
+                        line += vr; //vertical rule at the end
                     }
             }
             if (row === 0) { //top border.
-                this.println(this.parser.repeat(hr, (data.length + 3*vr.length) + this.parser.addArray(widths)));
+                this.println(this.parser.repeat(he, (data.length + 3*this.parser.stripHTML(vr).length) + this.parser.addArray(widths)));
             }
             this.println(line);
-            this.println(this.parser.repeat(hr, (data.length + 3*vr.length) + this.parser.addArray(widths)));
+            if (row < (data.length - 1)) {
+                this.println(this.parser.repeat(hr, (data.length + 3*vr.length) + this.parser.addArray(widths)));
+            } else {
+                this.println(this.parser.repeat(he, (data.length + 3*vr.length) + this.parser.addArray(widths)));
+            }
         }
     }
     this.onCommand = function(cmd) {
-        var preventDefault = false;
-        for(var i = 0; i < this.commandTasks.length && preventDefault === false; i++) {
-            if(this.commandTasks[i](cmd) == true) {
-                preventDefault = true;
+        if (this.activeProcessName === "\\") {
+            var preventOthers = false;
+            for(var i = 0; i < this.commandTasks.length && preventOthers === false; i++) {
+                if(this.commandTasks[i](cmd) == true) {
+                    preventOthers = true;
+                }
+            }
+        } else {
+            if (this.activeProcess(cmd) === true) { //if it returns true then we can exit from it
+                this.activeProcess = undefined;
+                this.activeProcessName = "\\";
             }
         }
     }
