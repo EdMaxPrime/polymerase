@@ -30,7 +30,7 @@ function Console(elem) {
             text += this.repeat(filler, (len - text.length));
             return text;
         },
-        stripHTML : function(str) {
+        stripHTML : function(str) { // another good one: /<\/?[^>]+(>|$)/g
             var result = str.replace(/&nbsp;/gi, " ").replace(/(<([^>]+)>)/gi, "").replace(/&gt;/gi, ">").replace(/&lt;/gi, "<");
             return result;
         },
@@ -181,13 +181,13 @@ function Console(elem) {
                     }
             }
             if (row === 0) { //top border.
-                this.println(this.parser.repeat(he, (data.length + 3*this.parser.stripHTML(vr).length) + this.parser.addArray(widths)));
+                this.println(this.parser.repeat(he, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths) + 2*this.parser.stripHTML(ve).length)/(this.parser.stripHTML(he).length)));
             }
             this.println(line);
             if (row < (data.length - 1)) {
-                this.println(this.parser.repeat(hr, (data.length + 3*vr.length) + this.parser.addArray(widths)));
-            } else {
-                this.println(this.parser.repeat(he, (data.length + 3*vr.length) + this.parser.addArray(widths)));
+                this.println(ve + this.parser.repeat(hr, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths))/(this.parser.stripHTML(hr).length)) + ve);
+            } else { // bottom row
+                this.println(this.parser.repeat(he, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths) + 2*this.parser.stripHTML(ve).length)/(this.parser.stripHTML(he).length)));
             }
         }
     }
