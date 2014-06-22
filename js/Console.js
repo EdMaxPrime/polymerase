@@ -54,10 +54,11 @@ function Console(elem) {
             return this.children[id];
         }
     }
-    this.println = function(msg) {
+    this.println = function(msg, id) {
+        var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
         console.log(msg);
         this.element.removeChild(this.element.childNodes[this.element.childNodes.length - 1]);
-        this.element.innerHTML += msg + "<br>";
+        this.element.innerHTML += "<div id='" + theId + "'>" + msg + "</div>";
         this.element.appendChild(document.createElement("p"));
         this.element.scrollTop = this.element.scrollHeight;
         this.amountLogged++;
@@ -108,15 +109,15 @@ function Console(elem) {
     }
     this.error = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
-        this.println("<div style='color:#F1654C;' id='" + theId + "'><b>&gt;&gt;&gt;</b>    " + msg + "</div>");
+        this.println("<span style='color:#F1654C;'><b>&gt;&gt;&gt;</b>    " + msg + "</span>", theId);
     }
     this.warn = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
-        this.println("<div style='color:#DEE825;' id='" + theId + "'><b>(!)</b>   " + msg + "</div>");
+        this.println("<span style='color:#DEE825;'><b>(!)</b>   " + msg + "</span>", theId);
     }
     this.success = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
-        this.println("<div style='color:rgb(116, 243, 133);' id='" + theId + "'>" + msg + "</div>");
+        this.println("<span style='color:rgb(116, 243, 133);'>" + msg + "</span>", theId);
     }
     this.table = function(data, options) {
         var hr = "-"; //horizontal rule
