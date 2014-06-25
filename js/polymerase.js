@@ -81,6 +81,7 @@ Polymerase.polymeraseCommand = function(command) { //global public static method
             if (cmd.length === 1) { //General Info
                 printer.println("<span style='color:yellow;'>Polymerase</span> syntax checker <span style='color:#EEB8A9'>v" + Polymerase.VERSION + "</span>&nbsp;made by EdMaxPrime");
                 printer.println(printer.parser.repeat("-", 50));
+                printer.println("");
                 return true;
             }
         }
