@@ -42,26 +42,55 @@ function Console(elem) {
             return result;
         }
     };
-    this.children = [];
+    this.children = {
+        length : 0,
+        array : [],
+        indexes : [],
+        push : function(id, elem) {
+            this.array[id] = elem;
+            this.indexes.push(id);
+            this.length++;
+        }
+    };
     this.getChild = function(id) {
-        if (this.children.hasOwnProperty(id) === true) {
-            return this.children[id];
+        if (this.children.array.hasOwnProperty(id) === true) {
+            return this.children.array[id];
         } else {
-            this.children[id] = {
+            this.children.push(id, {
                 real : false,
-                childId : id
-            };
-            return this.children[id];
+                childId : id,
+                element : undefined,
+                method : undefined,
+                text : ""
+            });
+            return this.children.array[id];
         }
     }
     this.println = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
+        msg.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
         console.log(msg);
         this.element.removeChild(this.element.childNodes[this.element.childNodes.length - 1]);
         this.element.innerHTML += "<div id='" + theId + "'>" + msg + "</div>";
         this.element.appendChild(document.createElement("p"));
         this.element.scrollTop = this.element.scrollHeight;
         this.amountLogged++;
+        if (this.getChild(theId).real === false) {
+            this.children.push(theId, {
+                real : true,
+                childId : theId,
+                element : document.getElementById(theId),
+                method : "println",
+                text : msg,
+                setText : function(txt) {
+                    if (txt !== undefined && txt != null) {
+                        document.getElementById(this.childId).innerHTML = txt;
+                    }
+                }
+            });
+        } else {
+            this.getChild(theId).element = document.getElementById(theId);
+        }
     }
     this.addTask = function(action) {
         this.commandTasks.push(action);
@@ -109,19 +138,53 @@ function Console(elem) {
     }
     this.error = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
+        this.children.push(theId, {
+                real : true,
+                childId : theId,
+                method : "error",
+                text : msg,
+                setText : function(txt) {
+                    if (txt !== undefined && txt != null) {
+                        document.getElementById(this.childId).innerHTML = txt;
+                    }
+                }
+            });
         this.println("<span style='color:#F1654C;'><b>&gt;&gt;&gt;</b>    " + msg + "</span>", theId);
     }
     this.warn = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
+        this.children.push(theId, {
+                real : true,
+                childId : theId,
+                method : "warn",
+                text : msg,
+                setText : function(txt) {
+                    if (txt !== undefined && txt != null) {
+                        document.getElementById(this.childId).innerHTML = txt;
+                    }
+                }
+            });
         this.println("<span style='color:#DEE825;'><b>(!)</b>   " + msg + "</span>", theId);
     }
     this.success = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
+        this.children.push(theId, {
+                real : true,
+                childId : theId,
+                method : "success",
+                text : msg,
+                setText : function(txt) {
+                    if (txt !== undefined && txt != null) {
+                        document.getElementById(this.childId).innerHTML = txt;
+                    }
+                }
+            });
         this.println("<span style='color:rgb(116, 243, 133);'>" + msg + "</span>", theId);
     }
     this.table = function(data, options) {
         var hr = "-"; //horizontal rule
         var vr = "|"; //vertical rule
+        var theId = this.element.id + "_" + (this.amountLogged+1); //id of the table element
         var fixedwidth = 15; //to make this 'undefined'(to use different widths for each column) make this negative in options
         var widths = new Array();
         var longestcolumn = 1; //the length of the longest array in data
@@ -138,7 +201,24 @@ function Console(elem) {
             if (options.hasOwnProperty("fixedwidth") === true) {
                 fixedwidth = options.fixedwidth;
             }
+            if (options.hasOwnProperty("id") == true) {
+                theId = options.id;
+            }
         }
+        this.children.push(theId, {
+                real : true,
+                childId : theId,
+                element : document.getElementById(theId),
+                method : "println",
+                text : "",
+                asColumns : [],
+                asRows : [],
+                setText : function(txt) {
+                    if (txt !== undefined && txt != null) {
+                        document.getElementById(this.childId).innerHTML = txt;
+                    }
+                }
+            });
         /*Find the width for each column*/
             for(var a = 0; a < data.length; a++) {
                 var longest = 0;
@@ -171,6 +251,7 @@ function Console(elem) {
             }
         }
         /*Now we actually print everything*/
+        var lines = new Array();
         for(var row = 0; row < data[0].length; row++) {
             var line = ve; //this is what we will be printing
             for(var col = 0; col < data.length; col++) {
@@ -182,15 +263,17 @@ function Console(elem) {
                     }
             }
             if (row === 0) { //top border.
-                this.println(this.parser.repeat(he, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths) + 2*this.parser.stripHTML(ve).length)/(this.parser.stripHTML(he).length)));
+                lines.push(this.parser.repeat(he, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths) + 2*this.parser.stripHTML(ve).length)/(this.parser.stripHTML(he).length)));
             }
-            this.println(line);
+            lines.push(line);
             if (row < (data.length - 1)) {
-                this.println(ve + this.parser.repeat(hr, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths))/(this.parser.stripHTML(hr).length)) + ve);
+                lines.push(ve + this.parser.repeat(hr, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths))/(this.parser.stripHTML(hr).length)) + ve);
             } else { // bottom row
-                this.println(this.parser.repeat(he, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths) + 2*this.parser.stripHTML(ve).length)/(this.parser.stripHTML(he).length)));
+                lines.push(this.parser.repeat(he, ((data.length - 1) * this.parser.stripHTML(vr).length + this.parser.addArray(widths) + 2*this.parser.stripHTML(ve).length)/(this.parser.stripHTML(he).length)));
             }
         }
+        this.println(lines.join("<br>"), theId);
+        this.getChild(theId).text = lines.join("<br>");
     }
     this.onCommand = function(cmd) {
         if (this.activeProcessName === "\\") {
