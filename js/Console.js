@@ -42,7 +42,7 @@ function Console(elem) {
             return result;
         }
     };
-    this.children = {
+    var children = { /*private variable*/
         length : 0,
         array : [],
         indexes : [],
@@ -53,17 +53,17 @@ function Console(elem) {
         }
     };
     this.getChild = function(id) {
-        if (this.children.array.hasOwnProperty(id) === true) {
-            return this.children.array[id];
+        if (children.array.hasOwnProperty(id) === true) {
+            return children.array[id];
         } else {
-            this.children.push(id, {
+            children.push(id, {
                 real : false,
                 childId : id,
                 element : undefined,
                 method : undefined,
                 text : ""
             });
-            return this.children.array[id];
+            return children.array[id];
         }
     }
     this.println = function(msg, id) {
@@ -72,11 +72,12 @@ function Console(elem) {
         console.log(msg);
         this.element.removeChild(this.element.childNodes[this.element.childNodes.length - 1]);
         this.element.innerHTML += "<div id='" + theId + "'>" + msg + "</div>";
-        this.element.appendChild(document.createElement("p"));
+        var bottom = document.createElement("p");
+        this.element.appendChild(bottom);
         this.element.scrollTop = this.element.scrollHeight;
         this.amountLogged++;
         if (this.getChild(theId).real === false) {
-            this.children.push(theId, {
+            children.push(theId, {
                 real : true,
                 childId : theId,
                 element : document.getElementById(theId),
@@ -138,7 +139,7 @@ function Console(elem) {
     }
     this.error = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
-        this.children.push(theId, {
+        children.push(theId, {
                 real : true,
                 childId : theId,
                 method : "error",
@@ -153,7 +154,7 @@ function Console(elem) {
     }
     this.warn = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
-        this.children.push(theId, {
+        children.push(theId, {
                 real : true,
                 childId : theId,
                 method : "warn",
@@ -168,7 +169,7 @@ function Console(elem) {
     }
     this.success = function(msg, id) {
         var theId = id? id : this.element.id + "_" + (this.amountLogged + 1);
-        this.children.push(theId, {
+        children.push(theId, {
                 real : true,
                 childId : theId,
                 method : "success",
@@ -205,7 +206,7 @@ function Console(elem) {
                 theId = options.id;
             }
         }
-        this.children.push(theId, {
+        children.push(theId, {
                 real : true,
                 childId : theId,
                 element : document.getElementById(theId),
